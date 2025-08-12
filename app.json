@@ -37,6 +37,15 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "firebaseApiKey": "AIzaSyDasjdi6CinJKlYh5OpTBLlrRs_B8sOP-4",
+      "firebaseAuthDomain": "instasplit-5603f.firebaseapp.com",
+      "firebaseProjectId": "instasplit-5603f",
+      "firebaseStorageBucket": "instasplit-5603f.firebasestorage.app",
+      "firebaseMessagingSenderId": "139174670991",
+      "firebaseAppId": "1:139174670991:web:6ff091635e0c7a349836fa",
+      "firebaseMeasurementId": "G-XMHWRZWGWF"
     }
   }
 }

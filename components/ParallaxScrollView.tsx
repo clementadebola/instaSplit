@@ -70,12 +70,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    height: HEADER_HEIGHT,
+    // height: HEADER_HEIGHT,
     overflow: 'hidden',
   },
   content: {
     flex: 1,
-    padding: 32,
+    // padding: 32,
     gap: 16,
     overflow: 'hidden',
   },
