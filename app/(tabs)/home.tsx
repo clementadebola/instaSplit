@@ -18,7 +18,7 @@ import { collection, query, where, getDocs, doc, getDoc } from "firebase/firesto
 
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { auth, db } from "../../utils/firebaseConfig";
-import { useTheme } from "@/theme/themeContext";
+import { useTheme } from "../../theme/themeContext";
 
 const { width } = Dimensions.get("window");
 
@@ -54,6 +54,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   
+  const { theme, darkMode } = useTheme();
 
   // Get display name from email or user profile
   const getDisplayName = (authUser: User, profileData?: any) => {
@@ -133,7 +134,7 @@ export default function HomeScreen() {
             title: data.title || 'Untitled Group',
             category: data.category || 'General',
             categoryIcon: data.categoryIcon || '📝',
-            categoryColor: data.categoryColor || '#85C1E9',
+            categoryColor: data.categoryColor || theme.colors.primary,
             admin: data.admin || '',
             membersList: data.membersList || [],
             totalAmount: data.totalAmount || 0,
@@ -162,7 +163,7 @@ export default function HomeScreen() {
                 title: data.title || 'Untitled Group',
                 category: data.category || 'General',
                 categoryIcon: data.categoryIcon || '📝',
-                categoryColor: data.categoryColor || '#85C1E9',
+                categoryColor: data.categoryColor || theme.colors.primary,
                 admin: data.admin || '',
                 membersList: data.membersList || [],
                 totalAmount: data.totalAmount || 0,
@@ -257,12 +258,9 @@ export default function HomeScreen() {
     }
   }, [user, fetchUserData]);
 
-
-    // Improved navigation to group details
+  // Improved navigation to group details
   const handleGroupPress = (groupId: string) => {
     console.log("Navigating to group details:", groupId);
-    // Navigate to the group details screen
-    // router.push(`/(group)/details/${groupId}`);
     router.push(`/(group)/${groupId}`);
   };
 
@@ -292,25 +290,258 @@ export default function HomeScreen() {
     }, [user, loading, refreshing, fetchUserData])
   );
 
+  // Create theme-aware styles
+  const themedStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      paddingTop: 40,
+      paddingHorizontal: 20,
+      paddingBottom: 20,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    appName: {
+      color: theme.colors.text,
+      fontSize: 24,
+      fontWeight: "bold",
+      marginBottom: 4,
+    },
+    userName: {
+      color: theme.colors.secondaryText ,
+      fontSize: 16,
+      fontWeight: "500",
+    },
+    card: {
+      backgroundColor: theme.colors.card,
+      padding: 20,
+      borderRadius: 20,
+      width: width * 0.42,
+      minHeight: 100,
+      justifyContent: "space-between",
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 5,
+    },
+    cardLabel: {
+      color: theme.colors.secondaryText,
+      fontSize: 14,
+      fontWeight: "500",
+      marginLeft: 8,
+    },
+    cardAmount: {
+      color: theme.colors.text,
+      fontSize: 24,
+      fontWeight: "800",
+    },
+    sectionTitle: {
+      color: darkMode ? theme.colors.text : "#000",
+      fontSize: 20,
+      fontWeight: "700",
+    },
+    viewAll: {
+      color: theme.colors.secondaryText,
+      fontSize: 14,
+      fontWeight: "500",
+    },
+    groupCard: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 20,
+      padding: 20,
+      marginRight: 15,
+      width: width * 0.75,
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    groupTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: theme.colors.text,
+      marginBottom: 2,
+    },
+    groupCategory: {
+      fontSize: 13,
+      color: theme.colors.secondaryText,
+      fontStyle: 'italic',
+    },
+    groupBadge: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      minWidth: 24,
+      alignItems: 'center',
+    },
+    groupStats: {
+      flexDirection: 'row',
+      marginBottom: 16,
+      backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.1)' : '#f8f9fa',
+      borderRadius: 12,
+      padding: 12,
+    },
+    statAmount: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+      marginBottom: 2,
+    },
+    statDate: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 2,
+    },
+    statLabel: {
+      fontSize: 11,
+      color: theme.colors.secondaryText,
+      textAlign: 'center',
+    },
+    divider: {
+      width: 1,
+      backgroundColor: theme.colors.border,
+      marginHorizontal: 12,
+    },
+    groupFooter: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border,
+    },
+    groupActivityText: {
+      fontSize: 12,
+      color: theme.colors.secondaryText,
+      marginLeft: 6,
+      flex: 1,
+    },
+    emptyGroupsCard: {
+      backgroundColor: theme.colors.card,
+      marginHorizontal: 20,
+      borderRadius: 20,
+      padding: 40,
+      alignItems: 'center',
+      marginBottom: 10,
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    emptyGroupsTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: theme.colors.text,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    emptyGroupsSubtext: {
+      fontSize: 14,
+      color: theme.colors.secondaryText,
+      textAlign: 'center',
+      marginBottom: 24,
+      lineHeight: 20,
+    },
+    createGroupButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 25,
+      flexDirection: 'row',
+      alignItems: 'center',
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    createGroupButtonText: {
+      color: "#FFFFFF",
+      fontWeight: '600',
+      fontSize: 16,
+    },
+    viewMoreGroupsButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginHorizontal: 20,
+      marginTop: 15,
+      paddingVertical: 12,
+    },
+    viewMoreGroupsText: {
+      color:  theme.colors.secondaryText ,
+      fontSize: 14,
+      fontWeight: '500',
+      marginRight: 8,
+    },
+    quickActionCard: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 16,
+      padding: 20,
+      width: (width - 60) / 2,
+      alignItems: 'center',
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 4,
+    },
+    quickActionIcon: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: `${theme.colors.primary}20`,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    quickActionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 4,
+      textAlign: 'center',
+    },
+    quickActionSubtext: {
+      fontSize: 12,
+      color: theme.colors.secondaryText,
+      textAlign: 'center',
+      lineHeight: 16,
+    },
+    loadingText: {
+      color: darkMode ? theme.colors.text : "#FFFFFF",
+      marginTop: 10,
+      fontSize: 16,
+    },
+  });
+
   // Render available groups as improved cards
   const renderAvailableGroups = () => {
     console.log('Available groups:', groups.length);
     
     if (groups.length === 0) {
       return (
-        <View style={styles.emptyGroupsCard}>
+        <View style={themedStyles.emptyGroupsCard}>
           <View style={styles.emptyGroupsContent}>
-            <Ionicons name="people-outline" size={48} color="#ccc" />
-            <Text style={styles.emptyGroupsTitle}>No groups yet</Text>
-            <Text style={styles.emptyGroupsSubtext}>
+            <Ionicons name="people-outline" size={48} color={theme.colors.secondaryText} />
+            <Text style={themedStyles.emptyGroupsTitle}>No groups yet</Text>
+            <Text style={themedStyles.emptyGroupsSubtext}>
               Create your first group to start splitting expenses with friends
             </Text>
             <TouchableOpacity 
-              style={styles.createGroupButton}
+              style={themedStyles.createGroupButton}
               onPress={() => router.push("/(tabs)/group")}
             >
-              <Ionicons name="add" size={20} color="#fff" style={{ marginRight: 8 }} />
-              <Text style={styles.createGroupButtonText}>Create Group</Text>
+              <Ionicons name="add" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
+              <Text style={themedStyles.createGroupButtonText}>Create Group</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -327,7 +558,7 @@ export default function HomeScreen() {
           {groups.map((group) => (
             <TouchableOpacity
               key={group.id}
-              style={styles.groupCard}
+              style={themedStyles.groupCard}
               onPress={() => handleGroupPress(group.id)}
               activeOpacity={0.8}
             >
@@ -336,36 +567,36 @@ export default function HomeScreen() {
                   <Text style={styles.groupIconText}>{group.categoryIcon}</Text>
                 </View>
                 <View style={styles.groupInfo}>
-                  <Text style={styles.groupTitle} numberOfLines={1}>{group.title}</Text>
-                  <Text style={styles.groupCategory}>{group.category}</Text>
+                  <Text style={themedStyles.groupTitle} numberOfLines={1}>{group.title}</Text>
+                  <Text style={themedStyles.groupCategory}>{group.category}</Text>
                 </View>
-                <View style={styles.groupBadge}>
+                <View style={themedStyles.groupBadge}>
                   <Text style={styles.groupBadgeText}>{group.members}</Text>
                 </View>
               </View>
               
-              <View style={styles.groupStats}>
+              <View style={themedStyles.groupStats}>
                 <View style={styles.statItem}>
-                  <Text style={styles.statAmount}>{group.owedAmount}</Text>
-                  <Text style={styles.statLabel}>
+                  <Text style={themedStyles.statAmount}>{group.owedAmount}</Text>
+                  <Text style={themedStyles.statLabel}>
                     {group.admin === user?.uid ? 'You are owed' : 'You owe'}
                   </Text>
                 </View>
-                <View style={styles.divider} />
+                <View style={themedStyles.divider} />
                 <View style={styles.statItem}>
-                  <Text style={styles.statDate}>{group.date}</Text>
-                  <Text style={styles.statLabel}>Created</Text>
+                  <Text style={themedStyles.statDate}>{group.date}</Text>
+                  <Text style={themedStyles.statLabel}>Created</Text>
                 </View>
               </View>
               
-              <View style={styles.groupFooter}>
+              <View style={themedStyles.groupFooter}>
                 <View style={styles.groupActivity}>
-                  <Ionicons name="time-outline" size={12} color="#888" />
-                  <Text style={styles.groupActivityText} numberOfLines={1}>
+                  <Ionicons name="time-outline" size={12} color={theme.colors.secondaryText} />
+                  <Text style={themedStyles.groupActivityText} numberOfLines={1}>
                     {group.recentActivity}
                   </Text>
                 </View>
-                <AntDesign name="right" size={14} color="#ccc" />
+                <AntDesign name="right" size={14} color={theme.colors.secondaryText} />
               </View>
             </TouchableOpacity>
           ))}
@@ -373,13 +604,13 @@ export default function HomeScreen() {
 
         {groups.length > 3 && (
           <TouchableOpacity 
-            style={styles.viewMoreGroupsButton}
+            style={themedStyles.viewMoreGroupsButton}
             onPress={() => router.push("/(tabs)/group")}
           >
-            <Text style={styles.viewMoreGroupsText}>
+            <Text style={themedStyles.viewMoreGroupsText}>
               View all {groups.length} groups
             </Text>
-            <AntDesign name="right" size={12} color="rgba(255,255,255,0.8)" />
+            <AntDesign name="right" size={12} color={theme.colors.secondaryText} />
           </TouchableOpacity>
         )}
       </View>
@@ -388,25 +619,25 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#fff" />
-        <Text style={styles.loadingText}>Loading...</Text>
+      <SafeAreaView style={[themedStyles.container, styles.centered]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={themedStyles.loadingText}>Loading...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={themedStyles.container}>
+      <View style={themedStyles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.appName}>InstaSplit</Text>
+          <Text style={themedStyles.appName}>InstaSplit</Text>
           {profile && (
-            <Text style={styles.userName}>Hello, {profile.displayName}!</Text>
+            <Text style={themedStyles.userName}>Hello, {profile.displayName}!</Text>
           )}
         </View>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.headerIconButton}>
-            <Ionicons name="notifications-outline" size={24} color="#fff" />
+            <Ionicons name="notifications-outline" size={24} color={ theme.colors.text } />
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
@@ -423,31 +654,31 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#6F2BD4FF']}
-            tintColor="#fff"
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
             title="Pull to refresh"
-            titleColor="#fff"
+            titleColor={theme.colors.text}
           />
         }
       >
         {/* Balance Cards */}
         <View style={styles.balanceContainer}>
-          <View style={styles.card}>
+          <View style={themedStyles.card}>
             <View style={styles.cardHeader}>
               <Ionicons name="arrow-up-circle-outline" size={24} color="#FF6B6B" />
-              <Text style={styles.cardLabel}>You Owe</Text>
+              <Text style={themedStyles.cardLabel}>You Owe</Text>
             </View>
-            <Text style={styles.cardAmount}>
+            <Text style={themedStyles.cardAmount}>
               ${profile?.totalOwed.toFixed(2) || '0.00'}
             </Text>
           </View>
 
-          <View style={styles.card}>
+          <View style={themedStyles.card}>
             <View style={styles.cardHeader}>
               <Ionicons name="arrow-down-circle-outline" size={24} color="#4ECDC4" />
-              <Text style={styles.cardLabel}>Owes You</Text>
+              <Text style={themedStyles.cardLabel}>Owes You</Text>
             </View>
-            <Text style={styles.cardAmount}>
+            <Text style={themedStyles.cardAmount}>
               ${profile?.totalOwing.toFixed(2) || '0.00'}
             </Text>
           </View>
@@ -455,10 +686,10 @@ export default function HomeScreen() {
 
         {/* Your Groups Section */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Pending Bills</Text>
+          <Text style={themedStyles.sectionTitle}>Pending Bills</Text>
           {groups.length > 0 && (
             <TouchableOpacity onPress={() => router.push("/(tabs)/group")}>
-              <Text style={styles.viewAll}>View All</Text>
+              <Text style={themedStyles.viewAll}>View All</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -468,21 +699,21 @@ export default function HomeScreen() {
 
         {/* Quick Actions */}
         <View style={styles.quickActionsSection}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={themedStyles.sectionTitle}>Quick Actions</Text>
           <View style={styles.quickActionsGrid}>
             <TouchableOpacity 
-              style={styles.quickActionCard}
+              style={themedStyles.quickActionCard}
               onPress={() => router.push("/(tabs)/group")}
             >
-              <View style={styles.quickActionIcon}>
-                <Ionicons name="people" size={24} color="#6F2BD4FF" />
+              <View style={themedStyles.quickActionIcon}>
+                <Ionicons name="people" size={24} color={theme.colors.primary} />
               </View>
-              <Text style={styles.quickActionTitle}>Create Group</Text>
-              <Text style={styles.quickActionSubtext}>Start splitting with friends</Text>
+              <Text style={themedStyles.quickActionTitle}>Create Group</Text>
+              <Text style={themedStyles.quickActionSubtext}>Start splitting with friends</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={styles.quickActionCard}
+              style={themedStyles.quickActionCard}
               onPress={() => {
                 if (groups.length > 0) {
                   router.push("/create-bill");
@@ -491,11 +722,11 @@ export default function HomeScreen() {
                 }
               }}
             >
-              <View style={styles.quickActionIcon}>
-                <Ionicons name="receipt" size={24} color="#6F2BD4FF" />
+              <View style={themedStyles.quickActionIcon}>
+                <Ionicons name="receipt" size={24} color={theme.colors.primary} />
               </View>
-              <Text style={styles.quickActionTitle}>Add Expense</Text>
-              <Text style={styles.quickActionSubtext}>Split a new bill</Text>
+              <Text style={themedStyles.quickActionTitle}>Add Expense</Text>
+              <Text style={themedStyles.quickActionSubtext}>Split a new bill</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -505,40 +736,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#6F2BD4FF",
-  },
   centered: {
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loadingText: {
-    color: '#fff',
-    marginTop: 10,
-    fontSize: 16,
-  },
-  header: {
-    paddingTop: 40,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   headerLeft: {
     flex: 1,
-  },
-  appName: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  userName: {
-    color: "rgba(255,255,255,0.8)",
-    fontSize: 16,
-    fontWeight: "500",
   },
   headerRight: {
     flexDirection: "row",
@@ -561,34 +764,10 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     paddingHorizontal: 10,
   },
-  card: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    padding: 20,
-    borderRadius: 20,
-    width: width * 0.42,
-    minHeight: 100,
-    justifyContent: "space-between",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
-  },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-  },
-  cardLabel: {
-    color: "#666",
-    fontSize: 14,
-    fontWeight: "500",
-    marginLeft: 8,
-  },
-  cardAmount: {
-    color: "#333",
-    fontSize: 24,
-    fontWeight: "800",
   },
   sectionHeader: {
     paddingHorizontal: 20,
@@ -598,33 +777,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  sectionTitle: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  viewAll: {
-    color: "rgba(255, 255, 255, 0.8)",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  
-  // Improved Groups Section Styles
   groupsScrollContainer: {
     paddingLeft: 20,
     paddingRight: 10,
-  },
-  groupCard: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 20,
-    marginRight: 15,
-    width: width * 0.75,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
   },
   groupCardHeader: {
     flexDirection: 'row',
@@ -650,146 +805,23 @@ const styles = StyleSheet.create({
   groupInfo: {
     flex: 1,
   },
-  groupTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 2,
-  },
-  groupCategory: {
-    fontSize: 13,
-    color: '#666',
-    fontStyle: 'italic',
-  },
-  groupBadge: {
-    backgroundColor: '#6F2BD4FF',
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    minWidth: 24,
-    alignItems: 'center',
-  },
   groupBadgeText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
   },
-  groupStats: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 12,
-  },
   statItem: {
     flex: 1,
     alignItems: 'center',
-  },
-  statAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#6F2BD4FF',
-    marginBottom: 2,
-  },
-  statDate: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 2,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: '#888',
-    textAlign: 'center',
-  },
-  divider: {
-    width: 1,
-    backgroundColor: '#e0e0e0',
-    marginHorizontal: 12,
-  },
-  groupFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
   },
   groupActivity: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  groupActivityText: {
-    fontSize: 12,
-    color: '#888',
-    marginLeft: 6,
-    flex: 1,
-  },
-  emptyGroupsCard: {
-    backgroundColor: "#fff",
-    marginHorizontal: 20,
-    borderRadius: 20,
-    padding: 40,
-    alignItems: 'center',
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
   emptyGroupsContent: {
     alignItems: 'center',
   },
-  emptyGroupsTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyGroupsSubtext: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
-    lineHeight: 20,
-  },
-  createGroupButton: {
-    backgroundColor: '#6F2BD4FF',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: "#6F2BD4FF",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  createGroupButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  viewMoreGroupsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 20,
-    marginTop: 15,
-    paddingVertical: 12,
-  },
-  viewMoreGroupsText: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 14,
-    fontWeight: '500',
-    marginRight: 8,
-  },
-
-  // Quick Actions Section
   quickActionsSection: {
     paddingHorizontal: 20,
     marginTop: 30,
@@ -798,39 +830,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 15,
-  },
-  quickActionCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    width: (width - 60) / 2,
-    alignItems: 'center',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  quickActionIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(111, 43, 212, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  quickActionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  quickActionSubtext: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 16,
   },
 });

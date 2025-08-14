@@ -12,13 +12,13 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CustomScrollView from "@/components/CustomScrollView";
 import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect, useCallback } from "react";
 import { getAuth, onAuthStateChanged, signOut, User } from "firebase/auth";
 import { doc, updateDoc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from "../../utils/firebaseConfig";
 import { router } from "expo-router";
+import { useTheme } from "../../theme/themeContext";
 
 interface UserStats {
   totalGroups: number;
@@ -37,7 +37,6 @@ interface UserStats {
 interface UserPreferences {
   notifications: boolean;
   emailUpdates: boolean;
-  darkMode: boolean;
   autoSplit: boolean;
 }
 
@@ -61,28 +60,14 @@ export default function ProfileScreen() {
   const [preferences, setPreferences] = useState<UserPreferences>({
     notifications: true,
     emailUpdates: false,
-    darkMode: false,
     autoSplit: false,
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [updating, setUpdating] = useState(false);
 
-  // Enhanced color scheme
-  const theme = {
-    primary: preferences.darkMode ? "#8B5CF6" : "#6F2BD4",
-    secondary: preferences.darkMode ? "#A78BFA" : "#9333EA",
-    background: preferences.darkMode ? "#0F0F23" : "#F8FAFC",
-    cardBackground: preferences.darkMode ? "#1E1B4B" : "#FFFFFF",
-    text: preferences.darkMode ? "#F1F5F9" : "#1E293B",
-    secondaryText: preferences.darkMode ? "#94A3B8" : "#64748B",
-    border: preferences.darkMode
-      ? "rgba(139, 92, 246, 0.2)"
-      : "rgba(111, 43, 212, 0.1)",
-    danger: "#EF4444",
-    success: "#10B981",
-    warning: "#F59E0B",
-  };
+  // Use the global theme context
+  const { theme, darkMode, toggleDarkMode } = useTheme();
 
   // Calculate user stats from Firebase data
   const calculateUserStats = async (userId: string): Promise<UserStats> => {
@@ -219,7 +204,6 @@ export default function ProfileScreen() {
         setPreferences({
           notifications: userData.preferences?.notifications ?? true,
           emailUpdates: userData.preferences?.emailUpdates ?? false,
-          darkMode: userData.preferences?.darkMode ?? false,
           autoSplit: userData.preferences?.autoSplit ?? false,
         });
       }
@@ -342,12 +326,12 @@ export default function ProfileScreen() {
       <SafeAreaView
         style={[
           styles.container,
-          { backgroundColor: theme.background },
+          { backgroundColor: theme.colors.background },
           styles.centered,
         ]}
       >
-        <ActivityIndicator size="large" color={theme.primary} />
-        <Text style={[styles.loadingText, { color: theme.text }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={[styles.loadingText, { color: theme.colors.text }]}>
           Loading profile...
         </Text>
       </SafeAreaView>
@@ -355,110 +339,107 @@ export default function ProfileScreen() {
   }
 
   return (
-   
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: theme.background }]}
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      {/* Header Section */}
+      <View
+        style={[
+          styles.header,
+          {
+            backgroundColor: theme.colors.card,
+            borderColor: theme.colors.border,
+          },
+        ]}
       >
-        {/* Header Section */}
-        <View
-          style={[
-            styles.header,
-            {
-              backgroundColor: theme.cardBackground,
-              borderColor: theme.border,
-            },
-          ]}
-        >
-          <View style={styles.profileSection}>
-            <Image
-              source={require("../../assets/images/Perss.jpg")}
-              style={styles.profileImg}
+        <View style={styles.profileSection}>
+          <Image
+            source={require("../../assets/images/Perss.jpg")}
+            style={styles.profileImg}
+          />
+          <View style={styles.profileBadge}>
+            <Ionicons
+              name="checkmark-circle"
+              size={20}
+              color={theme.colors.success}
             />
-            <View style={styles.profileBadge}>
-              <Ionicons
-                name="checkmark-circle"
-                size={20}
-                color={theme.success}
-              />
-            </View>
-          </View>
-
-          <View style={styles.nameContainer}>
-            {isEditingName ? (
-              <View style={styles.nameEditContainer}>
-                <TextInput
-                  style={[
-                    styles.nameInput,
-                    { color: theme.text, borderBottomColor: theme.primary },
-                  ]}
-                  value={displayName}
-                  onChangeText={setDisplayName}
-                  autoFocus
-                  onSubmitEditing={updateDisplayName}
-                  placeholder="Enter your name"
-                  placeholderTextColor={theme.secondaryText}
-                />
-                <TouchableOpacity
-                  style={[
-                    styles.saveButton,
-                    { backgroundColor: theme.primary },
-                  ]}
-                  onPress={updateDisplayName}
-                  disabled={updating}
-                >
-                  {updating ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                    <Ionicons name="checkmark" size={16} color="#fff" />
-                  )}
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={styles.nameDisplayContainer}>
-                <Text style={[styles.nameText, { color: theme.text }]}>
-                  {displayName}
-                </Text>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => setIsEditingName(true)}
-                >
-                  <Ionicons name="pencil" size={16} color={theme.primary} />
-                </TouchableOpacity>
-              </View>
-            )}
-
-            <Text style={[styles.emailText, { color: theme.secondaryText }]}>
-              {user?.email}
-            </Text>
-            <Text style={[styles.joinDate, { color: theme.secondaryText }]}>
-              Member since {formatDate(userStats.joinDate)}
-            </Text>
           </View>
         </View>
 
+        <View style={styles.nameContainer}>
+          {isEditingName ? (
+            <View style={styles.nameEditContainer}>
+              <TextInput
+                style={[
+                  styles.nameInput,
+                  { color: theme.colors.text, borderBottomColor: theme.colors.primary },
+                ]}
+                value={displayName}
+                onChangeText={setDisplayName}
+                autoFocus
+                onSubmitEditing={updateDisplayName}
+                placeholder="Enter your name"
+                placeholderTextColor={theme.colors.secondaryText}
+              />
+              <TouchableOpacity
+                style={[
+                  styles.saveButton,
+                  { backgroundColor: theme.colors.primary },
+                ]}
+                onPress={updateDisplayName}
+                disabled={updating}
+              >
+                {updating ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Ionicons name="checkmark" size={16} color="#fff" />
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.nameDisplayContainer}>
+              <Text style={[styles.nameText, { color: theme.colors.text }]}>
+                {displayName}
+              </Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => setIsEditingName(true)}
+              >
+                <Ionicons name="pencil" size={16} color={theme.colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
 
- <ScrollView
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={theme.primary}
-          colors={[theme.primary]}
-        />
-      }
-    >
+          <Text style={[styles.emailText, { color: theme.colors.secondaryText }]}>
+            {user?.email}
+          </Text>
+          <Text style={[styles.joinDate, { color: theme.colors.secondaryText }]}>
+            Member since {formatDate(userStats.joinDate)}
+          </Text>
+        </View>
+      </View>
 
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
+      >
         {/* Balance Overview */}
         <View
           style={[
             styles.section,
             {
-              backgroundColor: theme.cardBackground,
-              borderColor: theme.border,
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
             },
           ]}
         >
-          <Text style={[styles.sectionTitle, { color: theme.primary }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
             Financial Overview
           </Text>
 
@@ -467,17 +448,17 @@ export default function ProfileScreen() {
               style={[
                 styles.balanceItem,
                 { 
-                  backgroundColor: userStats.balance >= 0 ? `${theme.success}15` : `${theme.danger}15`
+                  backgroundColor: userStats.balance >= 0 ? `${theme.colors.success}15` : `${theme.colors.danger}15`
                 },
               ]}
             >
               <Text style={[
                 styles.balanceAmount, 
-                { color: userStats.balance >= 0 ? theme.success : theme.danger }
+                { color: userStats.balance >= 0 ? theme.colors.success : theme.colors.danger }
               ]}>
                 {formatCurrency(userStats.balance)}
               </Text>
-              <Text style={[styles.balanceLabel, { color: theme.secondaryText }]}>
+              <Text style={[styles.balanceLabel, { color: theme.colors.secondaryText }]}>
                 Net Balance
               </Text>
             </View>
@@ -485,13 +466,13 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.balanceItem,
-                { backgroundColor: `${theme.warning}15` },
+                { backgroundColor: `${theme.colors.warning}15` },
               ]}
             >
-              <Text style={[styles.balanceAmount, { color: theme.warning }]}>
+              <Text style={[styles.balanceAmount, { color: theme.colors.warning }]}>
                 {userStats.pendingBills}
               </Text>
-              <Text style={[styles.balanceLabel, { color: theme.secondaryText }]}>
+              <Text style={[styles.balanceLabel, { color: theme.colors.secondaryText }]}>
                 Pending Bills
               </Text>
             </View>
@@ -499,18 +480,18 @@ export default function ProfileScreen() {
 
           <View style={styles.balanceDetails}>
             <View style={styles.balanceDetailItem}>
-              <Text style={[styles.balanceDetailLabel, { color: theme.secondaryText }]}>
+              <Text style={[styles.balanceDetailLabel, { color: theme.colors.secondaryText }]}>
                 You are owed:
               </Text>
-              <Text style={[styles.balanceDetailAmount, { color: theme.success }]}>
+              <Text style={[styles.balanceDetailAmount, { color: theme.colors.success }]}>
                 {formatCurrency(userStats.totalOwed)}
               </Text>
             </View>
             <View style={styles.balanceDetailItem}>
-              <Text style={[styles.balanceDetailLabel, { color: theme.secondaryText }]}>
+              <Text style={[styles.balanceDetailLabel, { color: theme.colors.secondaryText }]}>
                 You owe:
               </Text>
-              <Text style={[styles.balanceDetailAmount, { color: theme.danger }]}>
+              <Text style={[styles.balanceDetailAmount, { color: theme.colors.danger }]}>
                 {formatCurrency(userStats.totalOwing)}
               </Text>
             </View>
@@ -522,12 +503,12 @@ export default function ProfileScreen() {
           style={[
             styles.section,
             {
-              backgroundColor: theme.cardBackground,
-              borderColor: theme.border,
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
             },
           ]}
         >
-          <Text style={[styles.sectionTitle, { color: theme.primary }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
             Your Activity
           </Text>
 
@@ -535,21 +516,21 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.statItem,
-                { backgroundColor: `${theme.primary}15` },
+                { backgroundColor: `${theme.colors.primary}15` },
               ]}
             >
               <View
                 style={[
                   styles.statIconContainer,
-                  { backgroundColor: theme.primary },
+                  { backgroundColor: theme.colors.primary },
                 ]}
               >
                 <Ionicons name="people" size={20} color="#fff" />
               </View>
-              <Text style={[styles.statNumber, { color: theme.primary }]}>
+              <Text style={[styles.statNumber, { color: theme.colors.primary }]}>
                 {userStats.totalGroups}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.secondaryText }]}>
+              <Text style={[styles.statLabel, { color: theme.colors.secondaryText }]}>
                 Groups
               </Text>
             </View>
@@ -557,21 +538,21 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.statItem,
-                { backgroundColor: `${theme.success}15` },
+                { backgroundColor: `${theme.colors.success}15` },
               ]}
             >
               <View
                 style={[
                   styles.statIconContainer,
-                  { backgroundColor: theme.success },
+                  { backgroundColor: theme.colors.success },
                 ]}
               >
                 <Ionicons name="receipt" size={20} color="#fff" />
               </View>
-              <Text style={[styles.statNumber, { color: theme.success }]}>
+              <Text style={[styles.statNumber, { color: theme.colors.success }]}>
                 {userStats.totalExpenses}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.secondaryText }]}>
+              <Text style={[styles.statLabel, { color: theme.colors.secondaryText }]}>
                 Expenses
               </Text>
             </View>
@@ -579,21 +560,21 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.statItem,
-                { backgroundColor: `${theme.warning}15` },
+                { backgroundColor: `${theme.colors.warning}15` },
               ]}
             >
               <View
                 style={[
                   styles.statIconContainer,
-                  { backgroundColor: theme.warning },
+                  { backgroundColor: theme.colors.warning },
                 ]}
               >
                 <Ionicons name="trending-up" size={20} color="#fff" />
               </View>
-              <Text style={[styles.statNumber, { color: theme.warning }]}>
+              <Text style={[styles.statNumber, { color: theme.colors.warning }]}>
                 {userStats.streakDays}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.secondaryText }]}>
+              <Text style={[styles.statLabel, { color: theme.colors.secondaryText }]}>
                 Day Streak
               </Text>
             </View>
@@ -601,21 +582,21 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.statItem,
-                { backgroundColor: `${theme.secondary}15` },
+                { backgroundColor: `${theme.colors.secondary}15` },
               ]}
             >
               <View
                 style={[
                   styles.statIconContainer,
-                  { backgroundColor: theme.secondary },
+                  { backgroundColor: theme.colors.secondary },
                 ]}
               >
                 <Ionicons name="cash" size={20} color="#fff" />
               </View>
-              <Text style={[styles.statNumber, { color: theme.secondary }]}>
+              <Text style={[styles.statNumber, { color: theme.colors.secondary }]}>
                 {formatCurrency(userStats.totalAmountSplit)}
               </Text>
-              <Text style={[styles.statLabel, { color: theme.secondaryText }]}>
+              <Text style={[styles.statLabel, { color: theme.colors.secondaryText }]}>
                 Total Split
               </Text>
             </View>
@@ -627,32 +608,32 @@ export default function ProfileScreen() {
           style={[
             styles.section,
             {
-              backgroundColor: theme.cardBackground,
-              borderColor: theme.border,
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
             },
           ]}
         >
-          <Text style={[styles.sectionTitle, { color: theme.primary }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
             Preferences
           </Text>
 
           <View
-            style={[styles.optionItem, { borderBottomColor: theme.border }]}
+            style={[styles.optionItem, { borderBottomColor: theme.colors.border }]}
           >
             <View
               style={[
                 styles.optionIconContainer,
-                { backgroundColor: `${theme.primary}15` },
+                { backgroundColor: `${theme.colors.primary}15` },
               ]}
             >
-              <Ionicons name="notifications" size={20} color={theme.primary} />
+              <Ionicons name="notifications" size={20} color={theme.colors.primary} />
             </View>
             <View style={styles.optionTextContainer}>
-              <Text style={[styles.optionText, { color: theme.text }]}>
+              <Text style={[styles.optionText, { color: theme.colors.text }]}>
                 Push Notifications
               </Text>
               <Text
-                style={[styles.optionSubtext, { color: theme.secondaryText }]}
+                style={[styles.optionSubtext, { color: theme.colors.secondaryText }]}
               >
                 Get notified about new expenses
               </Text>
@@ -662,29 +643,29 @@ export default function ProfileScreen() {
               onValueChange={(value) =>
                 updateUserPreferences({ notifications: value })
               }
-              thumbColor={preferences.notifications ? theme.primary : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: `${theme.primary}50` }}
+              thumbColor={preferences.notifications ? theme.colors.primary : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: `${theme.colors.primary}50` }}
               disabled={updating}
             />
           </View>
 
           <View
-            style={[styles.optionItem, { borderBottomColor: theme.border }]}
+            style={[styles.optionItem, { borderBottomColor: theme.colors.border }]}
           >
             <View
               style={[
                 styles.optionIconContainer,
-                { backgroundColor: `${theme.success}15` },
+                { backgroundColor: `${theme.colors.success}15` },
               ]}
             >
-              <Ionicons name="mail" size={20} color={theme.success} />
+              <Ionicons name="mail" size={20} color={theme.colors.success} />
             </View>
             <View style={styles.optionTextContainer}>
-              <Text style={[styles.optionText, { color: theme.text }]}>
+              <Text style={[styles.optionText, { color: theme.colors.text }]}>
                 Email Updates
               </Text>
               <Text
-                style={[styles.optionSubtext, { color: theme.secondaryText }]}
+                style={[styles.optionSubtext, { color: theme.colors.secondaryText }]}
               >
                 Weekly summary emails
               </Text>
@@ -694,29 +675,29 @@ export default function ProfileScreen() {
               onValueChange={(value) =>
                 updateUserPreferences({ emailUpdates: value })
               }
-              thumbColor={preferences.emailUpdates ? theme.success : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: `${theme.success}50` }}
+              thumbColor={preferences.emailUpdates ? theme.colors.success : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: `${theme.colors.success}50` }}
               disabled={updating}
             />
           </View>
 
           <View
-            style={[styles.optionItem, { borderBottomColor: theme.border }]}
+            style={[styles.optionItem, { borderBottomColor: theme.colors.border }]}
           >
             <View
               style={[
                 styles.optionIconContainer,
-                { backgroundColor: `${theme.warning}15` },
+                { backgroundColor: `${theme.colors.warning}15` },
               ]}
             >
-              <Ionicons name="flash" size={20} color={theme.warning} />
+              <Ionicons name="flash" size={20} color={theme.colors.warning} />
             </View>
             <View style={styles.optionTextContainer}>
-              <Text style={[styles.optionText, { color: theme.text }]}>
+              <Text style={[styles.optionText, { color: theme.colors.text }]}>
                 Auto Split
               </Text>
               <Text
-                style={[styles.optionSubtext, { color: theme.secondaryText }]}
+                style={[styles.optionSubtext, { color: theme.colors.secondaryText }]}
               >
                 Automatically split equal amounts
               </Text>
@@ -726,8 +707,8 @@ export default function ProfileScreen() {
               onValueChange={(value) =>
                 updateUserPreferences({ autoSplit: value })
               }
-              thumbColor={preferences.autoSplit ? theme.warning : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: `${theme.warning}50` }}
+              thumbColor={preferences.autoSplit ? theme.colors.warning : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: `${theme.colors.warning}50` }}
               disabled={updating}
             />
           </View>
@@ -736,32 +717,30 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.optionIconContainer,
-                { backgroundColor: `${theme.secondary}15` },
+                { backgroundColor: `${theme.colors.secondary}15` },
               ]}
             >
               <Ionicons
-                name={preferences.darkMode ? "sunny" : "moon"}
+                name={darkMode ? "sunny" : "moon"}
                 size={20}
-                color={theme.secondary}
+                color={theme.colors.secondary}
               />
             </View>
             <View style={styles.optionTextContainer}>
-              <Text style={[styles.optionText, { color: theme.text }]}>
+              <Text style={[styles.optionText, { color: theme.colors.text }]}>
                 Dark Mode
               </Text>
               <Text
-                style={[styles.optionSubtext, { color: theme.secondaryText }]}
+                style={[styles.optionSubtext, { color: theme.colors.secondaryText }]}
               >
                 Switch to dark theme
               </Text>
             </View>
             <Switch
-              value={preferences.darkMode}
-              onValueChange={(value) =>
-                updateUserPreferences({ darkMode: value })
-              }
-              thumbColor={preferences.darkMode ? theme.secondary : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: `${theme.secondary}50` }}
+              value={darkMode}
+              onValueChange={toggleDarkMode}
+              thumbColor={darkMode ? theme.colors.secondary : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: `${theme.colors.secondary}50` }}
               disabled={updating}
             />
           </View>
@@ -772,12 +751,12 @@ export default function ProfileScreen() {
           style={[
             styles.section,
             {
-              backgroundColor: theme.cardBackground,
-              borderColor: theme.border,
+              backgroundColor: theme.colors.card,
+              borderColor: theme.colors.border,
             },
           ]}
         >
-          <Text style={[styles.sectionTitle, { color: theme.primary }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.primary }]}>
             Account
           </Text>
 
@@ -785,17 +764,17 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.optionIconContainer,
-                { backgroundColor: `${theme.danger}15` },
+                { backgroundColor: `${theme.colors.danger}15` },
               ]}
             >
-              <Ionicons name="help-circle" size={20} color={theme.danger} />
+              <Ionicons name="help-circle" size={20} color={theme.colors.danger} />
             </View>
             <View style={styles.optionTextContainer}>
-              <Text style={[styles.optionText, { color: theme.text }]}>
+              <Text style={[styles.optionText, { color: theme.colors.text }]}>
                 Help & Support
               </Text>
               <Text
-                style={[styles.optionSubtext, { color: theme.secondaryText }]}
+                style={[styles.optionSubtext, { color: theme.colors.secondaryText }]}
               >
                 Get help or report issues
               </Text>
@@ -803,7 +782,7 @@ export default function ProfileScreen() {
             <Ionicons
               name="chevron-forward"
               size={20}
-              color={theme.secondaryText}
+              color={theme.colors.secondaryText}
             />
           </TouchableOpacity>
 
@@ -814,17 +793,17 @@ export default function ProfileScreen() {
             <View
               style={[
                 styles.optionIconContainer,
-                { backgroundColor: `${theme.danger}15` },
+                { backgroundColor: `${theme.colors.danger}15` },
               ]}
             >
-              <Ionicons name="log-out" size={20} color={theme.danger} />
+              <Ionicons name="log-out" size={20} color={theme.colors.danger} />
             </View>
             <View style={styles.optionTextContainer}>
-              <Text style={[styles.optionText, { color: theme.danger }]}>
+              <Text style={[styles.optionText, { color: theme.colors.danger }]}>
                 Sign Out
               </Text>
               <Text
-                style={[styles.optionSubtext, { color: theme.secondaryText }]}
+                style={[styles.optionSubtext, { color: theme.colors.secondaryText }]}
               >
                 Sign out of your account
               </Text>
@@ -834,13 +813,12 @@ export default function ProfileScreen() {
 
         {/* App Info */}
         <View style={styles.appInfo}>
-          <Text style={[styles.appVersion, { color: theme.secondaryText }]}>
+          <Text style={[styles.appVersion, { color: theme.colors.secondaryText }]}>
             InstaSplit v1.0.0
           </Text>
         </View>
-         </ScrollView>
-      </SafeAreaView>
-   
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
