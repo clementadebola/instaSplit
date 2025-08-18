@@ -18,24 +18,28 @@ function RootLayoutNav() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) return; // Don't do anything while loading
+    if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
-    
-    if (user && inAuthGroup) {
-      // User is signed in but trying to access auth pages, redirect to home
-      router.replace('/(tabs)/home');
+    const inAuthGroup = segments[0] === "(auth)";
+
+    if (user) {
+      const isNewUser =
+        user.metadata?.creationTime === user.metadata?.lastSignInTime;
+
+      if (inAuthGroup) {
+        if (isNewUser) {
+          router.replace("/(auth)/welcome"); // 👈 route to your welcome screen
+        } else {
+          router.replace("/(tabs)/home");
+        }
+      }
     } else if (!user && !inAuthGroup) {
-      // User is not signed in but trying to access protected pages, redirect to login
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
+      //  router.replace("/(auth)/welcome");
     }
   }, [user, segments, isLoading]);
 
-  // Show loading screen while checking authentication
-  if (isLoading) {
-    // You can customize this loading screen
-    return null;
-  }
+  if (isLoading) return null;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
