@@ -66,7 +66,6 @@ export default function ProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [updating, setUpdating] = useState(false);
 
-  // Use the global theme context
   const { theme, darkMode, toggleDarkMode } = useTheme();
 
   // Calculate user stats from Firebase data

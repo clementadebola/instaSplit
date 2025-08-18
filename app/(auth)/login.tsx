@@ -32,7 +32,7 @@ export default function login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert("Success", "Logged in successfully!");
+      // Alert.alert("Success", "Logged in successfully!");
       // No need to manually navigate - AuthContext will handle this automatically
     } catch (error: any) {
       console.error("Login Error:", error.message);

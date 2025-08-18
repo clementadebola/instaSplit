@@ -1,4 +1,3 @@
-// GroupDetailsScreen.tsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
@@ -9,7 +8,10 @@ import {
   ActivityIndicator,
   Alert,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
+
+const { width } = Dimensions.get('window');
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
@@ -17,6 +19,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
 
 import { auth, db } from '../../utils/firebaseConfig';
+import { useTheme } from '../../theme/themeContext';
 import { GroupHeader } from './components/GroupHeader';
 import { BalanceOverview } from './components/BalanceOverview';
 import { QuickActions } from './components/QuickActions';
@@ -88,6 +91,7 @@ interface UserBalance {
 
 export default function GroupDetailsScreen() {
   const { id } = useLocalSearchParams();
+  const { theme, darkMode } = useTheme();
   const [user, setUser] = useState<User | null>(null);
   const [group, setGroup] = useState<GroupDetails | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -303,7 +307,7 @@ export default function GroupDetailsScreen() {
         title: groupData.title || 'Untitled Group',
         category: groupData.category || 'General',
         categoryIcon: groupData.categoryIcon || '💰',
-        categoryColor: groupData.categoryColor || '#6F2BD4FF',
+        categoryColor: groupData.categoryColor || theme.colors.primary,
         admin: groupData.admin || '',
         adminName,
         membersList,
@@ -322,7 +326,7 @@ export default function GroupDetailsScreen() {
       console.error('Error fetching group details:', error);
       throw error;
     }
-  }, []);
+  }, [theme.colors.primary]);
 
   const fetchGroupExpenses = useCallback(async (groupId: string) => {
     try {
@@ -410,9 +414,204 @@ export default function GroupDetailsScreen() {
     return () => unsubscribe();
   }, [id, fetchData]);
 
+  // Create themed styles
+  const themedStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.primary,
+    },
+    centered: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingText: {
+      color: '#fff',
+      marginTop: 10,
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    errorText: {
+      color: '#fff',
+      fontSize: 18,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
+    backButton: {
+      backgroundColor: theme.colors.card,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 20,
+      marginTop: 20,
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 5,
+    },
+    backButtonText: {
+      color: theme.colors.primary,
+      fontWeight: '700',
+      fontSize: 16,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingTop: 40,
+      paddingBottom: 20,
+      justifyContent: 'space-between',
+    },
+    backBtn: {
+      padding: 8,
+      borderRadius: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    headerTitle: {
+      color: '#fff',
+      fontSize: 20,
+      fontWeight: '700',
+      flex: 1,
+      textAlign: 'center',
+      marginHorizontal: 20,
+    },
+    menuBtn: {
+      padding: 8,
+      borderRadius: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    tabNavigation: {
+      flexDirection: 'row',
+      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+      marginHorizontal: 20,
+      borderRadius: 20,
+      padding: 4,
+      marginBottom: 20,
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    tab: {
+      flex: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 16,
+      alignItems: 'center',
+    },
+    activeTab: {
+      backgroundColor: theme.colors.card,
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    tabText: {
+      color: 'rgba(255, 255, 255, 0.7)',
+      fontWeight: '500',
+      fontSize: 14,
+    },
+    activeTabText: {
+      color: theme.colors.primary,
+      fontWeight: '700',
+    },
+    content: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      borderTopLeftRadius: 25,
+      borderTopRightRadius: 25,
+    },
+    tabContent: {
+      padding: 20,
+    },
+    sectionTitle: {
+      color: darkMode ? theme.colors.text : "#000",
+      fontSize: 20,
+      fontWeight: "700",
+      marginBottom: 16,
+    },
+    debugContainer: {
+      backgroundColor: theme.colors.card,
+      padding: 20,
+      borderRadius: 20,
+      marginTop: 20,
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    debugTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      marginBottom: 12,
+      color: theme.colors.text,
+    },
+    debugText: {
+      fontSize: 15,
+      color: theme.colors.secondaryText,
+      marginBottom: 8,
+      fontWeight: '500',
+    },
+    overviewCard: {
+      backgroundColor: theme.colors.card,
+      padding: 20,
+      borderRadius: 20,
+      marginBottom: 16,
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    cardTitle: {
+      color: theme.colors.text,
+      fontSize: 18,
+      fontWeight: '700',
+    },
+    cardSubtitle: {
+      color: theme.colors.secondaryText,
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    amount: {
+      color: theme.colors.text,
+      fontSize: 28,
+      fontWeight: '800',
+    },
+    smallAmount: {
+      color: theme.colors.secondaryText,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
+
   // Render functions
   const renderOverviewTab = () => (
-    <View style={styles.tabContent}>
+    <View style={themedStyles.tabContent}>
+      <Text style={themedStyles.sectionTitle}>Group Overview</Text>
+      
+      <View style={themedStyles.overviewCard}>
+        <View style={themedStyles.cardHeader}>
+          <View>
+            <Text style={themedStyles.cardTitle}>Total Amount</Text>
+            <Text style={themedStyles.cardSubtitle}>{uniqueMembers.length} members</Text>
+          </View>
+          <Text style={themedStyles.amount}>${totalAmount.toFixed(2)}</Text>
+        </View>
+        <View style={themedStyles.cardHeader}>
+          <Text style={themedStyles.cardSubtitle}>Amount per member</Text>
+          <Text style={themedStyles.smallAmount}>${amountPerMember.toFixed(2)}</Text>
+        </View>
+      </View>
+
       <GroupHeader 
         group={group} 
         totalAmount={totalAmount}
@@ -425,20 +624,20 @@ export default function GroupDetailsScreen() {
       <QuickActions groupId={group?.id} />
       
       {/* Debug Information - Remove in production */}
-      <View style={styles.debugContainer}>
-        <Text style={styles.debugTitle}>Debug Info:</Text>
-        <Text style={styles.debugText}>Group Amount: ${group?.amount || 0}</Text>
-        <Text style={styles.debugText}>Bills Total: ${group?.bills?.reduce((sum, bill) => sum + Number(bill.amount), 0) || 0}</Text>
-        <Text style={styles.debugText}>Expenses Total: ${expenses.reduce((sum, exp) => sum + Number(exp.amount), 0)}</Text>
-        <Text style={styles.debugText}>Total Amount: ${totalAmount}</Text>
-        <Text style={styles.debugText}>Amount Per Member: ${amountPerMember}</Text>
-        <Text style={styles.debugText}>Members Count: {uniqueMembers.length}</Text>
+      <View style={themedStyles.debugContainer}>
+        <Text style={themedStyles.debugTitle}>Debug Information</Text>
+        <Text style={themedStyles.debugText}>Group Amount: ${group?.amount || 0}</Text>
+        <Text style={themedStyles.debugText}>Bills Total: ${group?.bills?.reduce((sum, bill) => sum + Number(bill.amount), 0) || 0}</Text>
+        <Text style={themedStyles.debugText}>Expenses Total: ${expenses.reduce((sum, exp) => sum + Number(exp.amount), 0)}</Text>
+        <Text style={themedStyles.debugText}>Total Amount: ${totalAmount}</Text>
+        <Text style={themedStyles.debugText}>Amount Per Member: ${amountPerMember}</Text>
+        <Text style={themedStyles.debugText}>Members Count: {uniqueMembers.length}</Text>
       </View>
     </View>
   );
 
   const renderExpensesTab = () => (
-    <View style={styles.tabContent}>
+    <View style={themedStyles.tabContent}>
       <ExpensesList 
         expenses={expenses} 
         groupId={group?.id}
@@ -449,78 +648,83 @@ export default function GroupDetailsScreen() {
   );
 
   const renderMembersTab = () => (
-    <View style={styles.tabContent}>
+    <View style={themedStyles.tabContent}>
       <MembersList members={memberBalances} />
     </View>
   );
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#6F2BD4FF" />
-        <Text style={styles.loadingText}>Loading group details...</Text>
+      <SafeAreaView style={[themedStyles.container, themedStyles.centered]}>
+        <ActivityIndicator size="large" color="#fff" />
+        <Text style={themedStyles.loadingText}>Loading group details...</Text>
       </SafeAreaView>
     );
   }
 
   if (!group) {
     return (
-      <SafeAreaView style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>Group not found</Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backButtonText}>Go Back</Text>
+      <SafeAreaView style={[themedStyles.container, themedStyles.centered]}>
+        <Text style={themedStyles.errorText}>Group not found</Text>
+        <TouchableOpacity style={themedStyles.backButton} onPress={() => router.back()}>
+          <Text style={themedStyles.backButtonText}>Go Back</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={themedStyles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+      <View style={themedStyles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={themedStyles.backBtn}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
+        <Text style={themedStyles.headerTitle} numberOfLines={1}>
           {group.title}
         </Text>
-        <TouchableOpacity style={styles.menuBtn}>
+        <TouchableOpacity style={themedStyles.menuBtn}>
           <Ionicons name="ellipsis-vertical" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
       {/* Tabs */}
-      <View style={styles.tabNavigation}>
+      <View style={themedStyles.tabNavigation}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'overview' && styles.activeTab]}
+          style={[themedStyles.tab, activeTab === 'overview' && themedStyles.activeTab]}
           onPress={() => setActiveTab('overview')}
         >
-          <Text style={[styles.tabText, activeTab === 'overview' && styles.activeTabText]}>
+          <Text style={[themedStyles.tabText, activeTab === 'overview' && themedStyles.activeTabText]}>
             Overview
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'expenses' && styles.activeTab]}
+          style={[themedStyles.tab, activeTab === 'expenses' && themedStyles.activeTab]}
           onPress={() => setActiveTab('expenses')}
         >
-          <Text style={[styles.tabText, activeTab === 'expenses' && styles.activeTabText]}>
+          <Text style={[themedStyles.tabText, activeTab === 'expenses' && themedStyles.activeTabText]}>
             Expenses ({expenses.length})
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'members' && styles.activeTab]}
+          style={[themedStyles.tab, activeTab === 'members' && themedStyles.activeTab]}
           onPress={() => setActiveTab('members')}
         >
-          <Text style={[styles.tabText, activeTab === 'members' && styles.activeTabText]}>
+          <Text style={[themedStyles.tabText, activeTab === 'members' && themedStyles.activeTabText]}>
             Members ({uniqueMembers.length})
           </Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView
-        style={styles.content}
+        style={themedStyles.content}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6F2BD4FF']} />
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
+          />
         }
       >
         {activeTab === 'overview' && renderOverviewTab()}
@@ -530,109 +734,3 @@ export default function GroupDetailsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#6F2BD4FF',
-  },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    color: '#fff',
-    marginTop: 10,
-    fontSize: 16,
-  },
-  errorText: {
-    color: '#fff',
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  backButton: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    marginTop: 20,
-  },
-  backButtonText: {
-    color: '#6F2BD4FF',
-    fontWeight: 'bold',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    justifyContent: 'space-between',
-  },
-  backBtn: {
-    padding: 8,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    flex: 1,
-    textAlign: 'center',
-    marginHorizontal: 20,
-  },
-  menuBtn: {
-    padding: 8,
-  },
-  tabNavigation: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginHorizontal: 20,
-    borderRadius: 25,
-    padding: 4,
-    marginBottom: 20,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  activeTab: {
-    backgroundColor: '#fff',
-  },
-  tabText: {
-    color: 'rgba(255, 255, 255, 0.7)',
-    fontWeight: '500',
-    fontSize: 14,
-  },
-  activeTabText: {
-    color: '#6F2BD4FF',
-    fontWeight: 'bold',
-  },
-  content: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-  },
-  tabContent: {
-    padding: 20,
-  },
-  debugContainer: {
-    backgroundColor: '#e9ecef',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  debugTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#495057',
-  },
-  debugText: {
-    fontSize: 14,
-    color: '#6c757d',
-    marginBottom: 5,
-  },
-});

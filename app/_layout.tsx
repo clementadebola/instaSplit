@@ -1,14 +1,51 @@
 import { ThemeProvider as NavigationThemeProvider, Theme as NavigationTheme } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Redirect, Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
+import { AuthProvider, useAuth } from "../contexts/AuthContexts"; // Adjust path as needed
 import { ThemeProvider, useTheme } from "../theme/themeContext";
 
 SplashScreen.preventAutoHideAsync();
+
+// This component handles the authentication routing logic
+function RootLayoutNav() {
+  const { user, isLoading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return; // Don't do anything while loading
+
+    const inAuthGroup = segments[0] === '(auth)';
+    
+    if (user && inAuthGroup) {
+      // User is signed in but trying to access auth pages, redirect to home
+      router.replace('/(tabs)/home');
+    } else if (!user && !inAuthGroup) {
+      // User is not signed in but trying to access protected pages, redirect to login
+      router.replace('/(auth)/login');
+    }
+  }, [user, segments, isLoading]);
+
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    // You can customize this loading screen
+    return null;
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="(group)" options={{ headerShown: false }} />
+      <Stack.Screen name="+not-found" />
+    </Stack>
+  );
+}
 
 function AppNavigator() {
   const { theme, darkMode } = useTheme();
@@ -46,13 +83,9 @@ function AppNavigator() {
 
   return (
     <NavigationThemeProvider value={navigationTheme}>
-      <Redirect href="/(tabs)/home" />
-      <Stack>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(group)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <AuthProvider>
+        <RootLayoutNav />
+      </AuthProvider>
       <StatusBar style={darkMode ? "light" : "dark"} />
     </NavigationThemeProvider>
   );

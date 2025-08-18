@@ -20,6 +20,7 @@ import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { Ionicons, FontAwesome, AntDesign } from "@expo/vector-icons";
 import { auth, db } from "../../utils/firebaseConfig";
 import CreateGroupModal from "@/components/createGroupModal/CreateGroupModal";
+import { useTheme } from "../../theme/themeContext";
 
 const { width, height } = Dimensions.get("window");
 
@@ -52,6 +53,7 @@ export default function GroupScreen() {
 
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
+    const { theme, darkMode } = useTheme();
 
   // Improved fetch groups function with better error handling
   const fetchGroups = async (userId: string) => {
@@ -312,18 +314,18 @@ export default function GroupScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headTextWrap}>
-          <Text style={styles.headTitle}>Groups</Text>
-          <Text style={styles.headSubtitle}>
+          <Text style={[styles.headTitle, {color: theme.colors.text}]}>Groups</Text>
+          <Text style={[styles.headSubtitle, {color: theme.colors.text}]}>
             You are in {groups.length} group{groups.length !== 1 ? 's' : ''}
           </Text>
         </View>
 
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.notificationBtn}>
-            <Ionicons name="notifications-outline" size={24} color="#fff" />
+            <Ionicons name="notifications-outline" size={24} color={ theme.colors.text } />
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
@@ -334,17 +336,13 @@ export default function GroupScreen() {
         </View>
       </View>
 
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
+     <ScrollView
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#fff"
-            colors={["#6F2BD4FF"]}
-            title="Pull to refresh"
-            titleColor="#fff"
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
           />
         }
       >
@@ -377,7 +375,6 @@ export default function GroupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#6F2BD4FF",
   },
   centered: {
     justifyContent: 'center',
@@ -400,14 +397,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   headTitle: {
-    color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
   },
   headSubtitle: {
     textAlign: "left",
     fontSize: 14,
-    color: "rgba(255, 255, 255, 0.8)",
     marginTop: 5,
   },
   headerRight: {
