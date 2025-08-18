@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { Bill } from '../utils/constants';
+import { useTheme } from '../../../theme/themeContext';
 
 interface AddBillsStepProps {
   bills: Bill[];
@@ -16,6 +17,7 @@ export default function AddBillsStep({
 }: AddBillsStepProps) {
   const [newBillName, setNewBillName] = useState('');
   const [newBillAmount, setNewBillAmount] = useState('');
+  const { theme } = useTheme();
 
   const addBill = () => {
     if (!newBillName.trim()) {
@@ -48,8 +50,10 @@ export default function AddBillsStep({
 
   const getTotalBillAmount = () => bills.reduce((sum, bill) => sum + bill.amount, 0);
 
+  const styles = createStyles(theme);
+
   return (
-    <View style={styles.stepContent}>
+    <View style={[styles.stepContent, { backgroundColor: theme.colors.background }]}>
       <Text style={styles.stepTitle}>💰 Add Bills</Text>
       <Text style={styles.stepDescription}>Add the expenses you want to split</Text>
       
@@ -69,7 +73,7 @@ export default function AddBillsStep({
               value={newBillName}
               onChangeText={setNewBillName}
               maxLength={30}
-              placeholderTextColor="#999"
+              placeholderTextColor={theme.colors.secondaryText}
             />
           </View>
           
@@ -83,7 +87,7 @@ export default function AddBillsStep({
                 value={newBillAmount}
                 onChangeText={setNewBillAmount}
                 keyboardType="decimal-pad"
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.colors.secondaryText}
               />
             </View>
           </View>
@@ -136,7 +140,7 @@ export default function AddBillsStep({
                   onPress={() => removeBill(bill.id)}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Feather name="trash-2" size={18} color="#ff4444" />
+                  <Feather name="trash-2" size={18} color={theme.colors.danger} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -171,37 +175,37 @@ export default function AddBillsStep({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   stepContent: {
     padding: 20,
   },
   stepTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#212529',
+    color: theme.colors.text,
     marginBottom: 8,
   },
   stepDescription: {
     fontSize: 16,
-    color: '#6c757d',
+    color: theme.colors.secondaryText,
     marginBottom: 24,
     lineHeight: 22,
   },
   
   // Add Bill Form Styles
   addBillCard: {
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#dee2e6',
-    shadowColor: '#000',
+    borderColor: theme.colors.border,
+    shadowColor: theme.dark ? 'rgba(139, 92, 246, 0.3)' : '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: theme.dark ? 0.3 : 0.1,
     shadowRadius: 3.84,
     elevation: 5,
   },
@@ -211,12 +215,12 @@ const styles = StyleSheet.create({
   addBillTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#212529',
+    color: theme.colors.text,
     marginBottom: 4,
   },
   addBillSubtitle: {
     fontSize: 14,
-    color: '#6c757d',
+    color: theme.colors.secondaryText,
   },
   formContainer: {
     gap: 16,
@@ -227,30 +231,30 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#495057',
+    color: theme.colors.text,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: theme.colors.border,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    backgroundColor: '#f8f9fa',
-    color: '#212529',
+    backgroundColor: theme.dark ? 'rgba(139, 92, 246, 0.1)' : '#f8f9fa',
+    color: theme.colors.text,
   },
   amountInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: theme.colors.border,
     borderRadius: 12,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.dark ? 'rgba(139, 92, 246, 0.1)' : '#f8f9fa',
     paddingLeft: 16,
   },
   currencySymbol: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#495057',
+    color: theme.colors.text,
     marginRight: 8,
   },
   amountInput: {
@@ -262,14 +266,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     borderRadius: 12,
     padding: 16,
     gap: 8,
     marginTop: 8,
   },
   disabledButton: {
-    backgroundColor: '#ced4da',
+    backgroundColor: theme.colors.secondaryText,
+    opacity: 0.6,
   },
   addButtonText: {
     fontSize: 16,
@@ -287,18 +292,18 @@ const styles = StyleSheet.create({
   billsListTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#212529',
+    color: theme.colors.text,
     marginBottom: 2,
   },
   billsSubtitle: {
     fontSize: 14,
-    color: '#6c757d',
+    color: theme.colors.secondaryText,
   },
   billsContainer: {
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: theme.colors.border,
     overflow: 'hidden',
   },
   billCard: {
@@ -306,7 +311,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f3f4',
+    borderBottomColor: theme.colors.border,
   },
   lastBillCard: {
     borderBottomWidth: 0,
@@ -315,7 +320,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#e3f2fd',
+    backgroundColor: theme.dark ? 'rgba(139, 92, 246, 0.2)' : '#e3f2fd',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -329,12 +334,12 @@ const styles = StyleSheet.create({
   billName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#212529',
+    color: theme.colors.text,
     marginBottom: 2,
   },
   billDate: {
     fontSize: 12,
-    color: '#6c757d',
+    color: theme.colors.secondaryText,
   },
   billAmountContainer: {
     marginRight: 12,
@@ -342,20 +347,20 @@ const styles = StyleSheet.create({
   billAmount: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#007AFF',
+    color: theme.colors.primary,
   },
   deleteBillButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#ffebee',
+    backgroundColor: theme.dark ? 'rgba(239, 68, 68, 0.2)' : '#ffebee',
     alignItems: 'center',
     justifyContent: 'center',
   },
   
   // Total Card Styles
   totalCard: {
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     borderRadius: 16,
     padding: 20,
     marginTop: 16,
@@ -391,10 +396,10 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     padding: 40,
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: theme.colors.border,
     borderStyle: 'dashed',
   },
   emptyStateIcon: {
@@ -404,12 +409,12 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#495057',
+    color: theme.colors.text,
     marginBottom: 8,
   },
   emptyStateDescription: {
     fontSize: 14,
-    color: '#6c757d',
+    color: theme.colors.secondaryText,
     textAlign: 'center',
     lineHeight: 20,
   },

@@ -53,7 +53,7 @@ export default function GroupScreen() {
 
   const openModal = () => setIsModalVisible(true);
   const closeModal = () => setIsModalVisible(false);
-    const { theme, darkMode } = useTheme();
+  const { theme, darkMode } = useTheme();
 
   // Improved fetch groups function with better error handling
   const fetchGroups = async (userId: string) => {
@@ -84,7 +84,7 @@ export default function GroupScreen() {
             title: data.title || 'Untitled Group',
             category: data.category || 'General',
             categoryIcon: data.categoryIcon || '📝',
-            categoryColor: data.categoryColor || '#85C1E9',
+            categoryColor: data.categoryColor || theme.colors.primary,
             date: data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : new Date().toLocaleDateString(),
             members: (data.membersList?.length || 0) + 1, // +1 for admin
             amount: `${(data.totalAmount || 0).toFixed(2)}`,
@@ -127,7 +127,7 @@ export default function GroupScreen() {
                 title: data.title || 'Untitled Group',
                 category: data.category || 'General',
                 categoryIcon: data.categoryIcon || '📝',
-                categoryColor: data.categoryColor || '#85C1E9',
+                categoryColor: data.categoryColor || theme.colors.primary,
                 date: data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : new Date().toLocaleDateString(),
                 members: (data.membersList?.length || 0) + 1,
                 amount: `${(data.totalAmount || 0).toFixed(2)}`,
@@ -234,36 +234,36 @@ export default function GroupScreen() {
     
     if (group.admin === user?.uid) {
       statusText = `You are owed ${group.owedAmount}`;
-      statusColor = "#008000";
-      statusBgColor = "#d0f5d6";
+      statusColor = theme.colors.success;
+      statusBgColor = darkMode ? "rgba(16, 185, 129, 0.1)" : "rgba(16, 185, 129, 0.1)";
     } else {
       statusText = `You owe ${group.owedAmount}`;
-      statusColor = "#cc0000";
-      statusBgColor = "#ffe6e6";
+      statusColor = theme.colors.danger;
+      statusBgColor = darkMode ? "rgba(239, 68, 68, 0.1)" : "rgba(239, 68, 68, 0.1)";
     }
 
     return (
       <TouchableOpacity
         key={group.id}
-        style={styles.groupCard}
+        style={[styles.groupCard, { backgroundColor: theme.colors.card }]}
         onPress={() => handleGroupPress(group.id)}
         activeOpacity={0.7}
       >
         <View style={styles.groupHeader}>
           <View style={styles.groupLeft}>
-            <View style={[styles.groupIconContainer, { backgroundColor: group.categoryColor || "#85C1E9" }]}>
+            <View style={[styles.groupIconContainer, { backgroundColor: group.categoryColor || theme.colors.primary }]}>
               <Text style={styles.groupIconText}>{group.categoryIcon || "📝"}</Text>
             </View>
             <View style={styles.groupInfo}>
-              <Text style={styles.groupTitle} numberOfLines={1}>{group.title}</Text>
-              <Text style={styles.groupCategory}>{group.category}</Text>
-              <Text style={styles.groupDate}>{group.date}</Text>
-              <Text style={styles.groupMembers}>{group.members} members</Text>
+              <Text style={[styles.groupTitle, { color: theme.colors.text }]} numberOfLines={1}>{group.title}</Text>
+              <Text style={[styles.groupCategory, { color: theme.colors.secondaryText }]}>{group.category}</Text>
+              <Text style={[styles.groupDate, { color: theme.colors.secondaryText }]}>{group.date}</Text>
+              <Text style={[styles.groupMembers, { color: theme.colors.secondaryText }]}>{group.members} members</Text>
             </View>
           </View>
           <View style={styles.groupRight}>
-            <Text style={styles.groupAmount}>{group.amount}</Text>
-            <AntDesign name="right" size={16} color="#666" />
+            <Text style={[styles.groupAmount, { color: theme.colors.primary }]}>{group.amount}</Text>
+            <AntDesign name="right" size={16} color={theme.colors.secondaryText} />
           </View>
         </View>
 
@@ -273,10 +273,10 @@ export default function GroupScreen() {
           </Text>
         </View>
 
-        <View style={styles.recentActivity}>
+        <View style={[styles.recentActivity, { borderTopColor: theme.colors.border }]}>
           <View style={styles.activityRow}>
-            <AntDesign name="clockcircleo" size={12} color="#666" />
-            <Text style={styles.recentActivityText} numberOfLines={1}>
+            <AntDesign name="clockcircleo" size={12} color={theme.colors.secondaryText} />
+            <Text style={[styles.recentActivityText, { color: theme.colors.secondaryText }]} numberOfLines={1}>
               {group.recentActivity}
             </Text>
           </View>
@@ -287,14 +287,14 @@ export default function GroupScreen() {
 
   const renderEmptyState = () => (
     <View style={styles.emptyStateContainer}>
-      <View style={styles.emptyStateCard}>
-        <Ionicons name="people-outline" size={60} color="#ccc" />
-        <Text style={styles.emptyStateTitle}>No groups yet</Text>
-        <Text style={styles.emptyStateSubtext}>
+      <View style={[styles.emptyStateCard, { backgroundColor: theme.colors.card }]}>
+        <Ionicons name="people-outline" size={60} color={theme.colors.secondaryText} />
+        <Text style={[styles.emptyStateTitle, { color: theme.colors.text }]}>No groups yet</Text>
+        <Text style={[styles.emptyStateSubtext, { color: theme.colors.secondaryText }]}>
           Create your first group to start splitting expenses with friends
         </Text>
         <TouchableOpacity 
-          style={styles.createFirstGroupBtn}
+          style={[styles.createFirstGroupBtn, { backgroundColor: theme.colors.primary }]}
           onPress={openModal}
         >
           <Ionicons name="add-circle-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
@@ -306,9 +306,9 @@ export default function GroupScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#fff" />
-        <Text style={styles.loadingText}>Loading groups...</Text>
+      <SafeAreaView style={[styles.container, styles.centered, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={[styles.loadingText, { color: theme.colors.text }]}>Loading groups...</Text>
       </SafeAreaView>
     );
   }
@@ -318,19 +318,19 @@ export default function GroupScreen() {
       <View style={styles.header}>
         <View style={styles.headTextWrap}>
           <Text style={[styles.headTitle, {color: theme.colors.text}]}>Groups</Text>
-          <Text style={[styles.headSubtitle, {color: theme.colors.text}]}>
+          <Text style={[styles.headSubtitle, {color: theme.colors.secondaryText}]}>
             You are in {groups.length} group{groups.length !== 1 ? 's' : ''}
           </Text>
         </View>
 
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.notificationBtn}>
-            <Ionicons name="notifications-outline" size={24} color={ theme.colors.text } />
+          <TouchableOpacity style={[styles.notificationBtn, { backgroundColor: theme.colors.border }]}>
+            <Ionicons name="notifications-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
               source={require("../../assets/images/Perss.jpg")}
-              style={styles.avatar}
+              style={[styles.avatar, { borderColor: theme.colors.border }]}
             />
           </TouchableOpacity>
         </View>
@@ -353,9 +353,9 @@ export default function GroupScreen() {
             <>
               {groups.map((group) => renderGroupCard(group))}
               
-              <TouchableOpacity style={styles.addGroupBtn} onPress={openModal}>
-                <AntDesign name="plus" color="#6F2BD4FF" size={23} />
-                <Text style={styles.addGroupText}>Create new group</Text>
+              <TouchableOpacity style={[styles.addGroupBtn, { backgroundColor: theme.colors.card }]} onPress={openModal}>
+                <AntDesign name="plus" color={theme.colors.primary} size={23} />
+                <Text style={[styles.addGroupText, { color: theme.colors.primary }]}>Create new group</Text>
               </TouchableOpacity>
             </>
           )}
@@ -381,7 +381,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#fff',
     marginTop: 10,
     fontSize: 16,
   },
@@ -413,14 +412,12 @@ const styles = StyleSheet.create({
   notificationBtn: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.1)",
   },
   avatar: {
     width: 45,
     height: 45,
     borderRadius: 22.5,
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.3)",
   },
 
   // group card section
@@ -429,7 +426,6 @@ const styles = StyleSheet.create({
   },
 
   groupCard: {
-    backgroundColor: "#fff",
     marginHorizontal: 20,
     borderRadius: 20,
     padding: 20,
@@ -476,23 +472,19 @@ const styles = StyleSheet.create({
   groupTitle: {
     fontWeight: "bold",
     fontSize: 18,
-    color: "#333",
     marginBottom: 4,
   },
   groupCategory: {
     fontSize: 13,
-    color: "#666",
     fontStyle: 'italic',
     marginBottom: 2,
   },
   groupDate: {
     fontSize: 12,
-    color: "#999",
     marginBottom: 2,
   },
   groupMembers: {
     fontSize: 12,
-    color: "#999",
   },
   groupRight: {
     alignItems: "flex-end",
@@ -502,7 +494,6 @@ const styles = StyleSheet.create({
   groupAmount: {
     fontWeight: "bold",
     fontSize: 18,
-    color: "#6F2BD4FF",
   },
   statusTag: {
     marginTop: 12,
@@ -514,7 +505,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
   },
   activityRow: {
     flexDirection: 'row',
@@ -522,14 +512,12 @@ const styles = StyleSheet.create({
   },
   recentActivityText: {
     fontSize: 12,
-    color: "#666",
     fontStyle: "italic",
     marginLeft: 6,
     flex: 1,
   },
 
   addGroupBtn: {
-    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
     marginTop: 15,
@@ -549,7 +537,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   addGroupText: {
-    color: "#6F2BD4FF",
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -562,7 +549,6 @@ const styles = StyleSheet.create({
     paddingVertical: 80,
   },
   emptyStateCard: {
-    backgroundColor: "#fff",
     marginHorizontal: 20,
     borderRadius: 20,
     padding: 40,
@@ -579,19 +565,16 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#333',
     marginTop: 20,
     marginBottom: 12,
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 30,
     lineHeight: 22,
   },
   createFirstGroupBtn: {
-    backgroundColor: '#6F2BD4FF',
     paddingHorizontal: 25,
     paddingVertical: 14,
     borderRadius: 25,

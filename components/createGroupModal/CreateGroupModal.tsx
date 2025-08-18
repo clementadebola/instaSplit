@@ -16,6 +16,7 @@ import * as Contacts from "expo-contacts";
 import * as SMS from "expo-sms";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../utils/firebaseConfig";
+import { useTheme } from "../../theme/themeContext";
 
 // Import components
 import StepIndicator from "./components/StepIndicator";
@@ -54,6 +55,9 @@ export default function CreateGroupModal({
   const [loading, setLoading] = useState(false);
   const [contactsLoading, setContactsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Theme context
+  const { theme, darkMode } = useTheme();
 
   // Load contacts when modal opens
   useEffect(() => {
@@ -233,7 +237,7 @@ export default function CreateGroupModal({
         title: groupName.trim(),
         category: finalCategory,
         categoryIcon: selectedCategoryData?.icon || "📝",
-        categoryColor: selectedCategoryData?.color || "#85C1E9",
+        categoryColor: selectedCategoryData?.color || theme.colors.primary,
         
         // Dates and timestamps
         date: new Date().toLocaleDateString(),
@@ -405,6 +409,66 @@ export default function CreateGroupModal({
     }
   };
 
+  // Create theme-aware styles
+  const themedStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      backgroundColor: theme.colors.card,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerButton: {
+      minWidth: 60,
+      alignItems: "center",
+    },
+    headerTitleContainer: {
+      alignItems: "center",
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: theme.colors.text,
+    },
+    headerSubtitle: {
+      fontSize: 12,
+      color: theme.colors.secondaryText,
+      marginTop: 2,
+    },
+    nextButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.colors.primary,
+    },
+    navigation: {
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      backgroundColor: theme.colors.card,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    backButton: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    backButtonText: {
+      fontSize: 16,
+      color: theme.colors.primary,
+      marginLeft: 4,
+    },
+    content: {
+      flex: 1,
+    },
+  });
+
   return (
     <Modal
       visible={visible}
@@ -412,22 +476,22 @@ export default function CreateGroupModal({
       presentationStyle="formSheet"
       onRequestClose={onClose}
     >
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" />
+      <SafeAreaView style={themedStyles.container}>
+        <StatusBar barStyle={darkMode ? "light-content" : "dark-content"} />
 
         {/* Header */}
-        <View style={styles.header}>
+        <View style={themedStyles.header}>
           <TouchableOpacity
             onPress={onClose}
             disabled={loading}
-            style={styles.headerButton}
+            style={themedStyles.headerButton}
           >
-            <Feather name="x" size={24} color="#007AFF" />
+            <Feather name="x" size={24} color={theme.colors.primary} />
           </TouchableOpacity>
           
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerTitle}>Create Group</Text>
-            <Text style={styles.headerSubtitle}>{getStepTitle()}</Text>
+          <View style={themedStyles.headerTitleContainer}>
+            <Text style={themedStyles.headerTitle}>Create Group</Text>
+            <Text style={themedStyles.headerSubtitle}>{getStepTitle()}</Text>
           </View>
           
           <TouchableOpacity
@@ -438,14 +502,14 @@ export default function CreateGroupModal({
             }
             disabled={loading || !canProceedToNextStep()}
             style={[
-              styles.headerButton,
+              themedStyles.headerButton,
               { opacity: !canProceedToNextStep() || loading ? 0.5 : 1 },
             ]}
           >
             {loading ? (
-              <ActivityIndicator size="small" color="#007AFF" />
+              <ActivityIndicator size="small" color={theme.colors.primary} />
             ) : (
-              <Text style={styles.nextButtonText}>
+              <Text style={themedStyles.nextButtonText}>
                 {currentStep === 4 ? "Create" : "Next"}
               </Text>
             )}
@@ -456,87 +520,28 @@ export default function CreateGroupModal({
         <StepIndicator currentStep={currentStep} />
 
         {/* Navigation */}
-        <View style={styles.navigation}>
+        <View style={themedStyles.navigation}>
           {currentStep > 1 && (
             <TouchableOpacity
-              style={styles.backButton}
+              style={themedStyles.backButton}
               onPress={() => setCurrentStep((prev) => prev - 1)}
               disabled={loading}
             >
-              <Feather name="chevron-left" size={20} color="#007AFF" />
-              <Text style={styles.backButtonText}>Back</Text>
+              <Feather name="chevron-left" size={20} color={theme.colors.primary} />
+              <Text style={themedStyles.backButtonText}>Back</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {/* Content */}
-        <ScrollView 
-          style={styles.content} 
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
+        <View 
+          style={themedStyles.content} 
+          // showsVerticalScrollIndicator={false}
+          // keyboardShouldPersistTaps="handled"
         >
           {renderStepContent()}
-        </ScrollView>
+        </View>
       </SafeAreaView>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8f9fa",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: "white",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-  },
-  headerButton: {
-    minWidth: 60,
-    alignItems: "center",
-  },
-  headerTitleContainer: {
-    alignItems: "center",
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#212529",
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: "#6c757d",
-    marginTop: 2,
-  },
-  nextButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#007AFF",
-  },
-  navigation: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: "white",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-  },
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: "#007AFF",
-    marginLeft: 4,
-  },
-  content: {
-    flex: 1,
-  },
-});

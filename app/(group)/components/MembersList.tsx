@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from "../../../theme/themeContext";
 
 interface MemberBalance {
   id: string;
@@ -16,10 +17,12 @@ interface MembersListProps {
 }
 
 export const MembersList: React.FC<MembersListProps> = ({ members }) => {
+  const { theme, darkMode } = useTheme();
+
   const getBalanceColor = (balance: number) => {
-    if (balance > 0) return '#28A745'; // Green for owed money
-    if (balance < 0) return '#DC3545'; // Red for owing money
-    return '#6c757d'; // Gray for settled
+    if (balance > 0) return theme.colors.success; // Green for owed money
+    if (balance < 0) return theme.colors.danger; // Red for owing money
+    return theme.colors.secondaryText; // Gray for settled
   };
 
   const getBalanceText = (balance: number) => {
@@ -49,71 +52,302 @@ export const MembersList: React.FC<MembersListProps> = ({ members }) => {
   const totalOwing = members.reduce((sum, member) => sum + (member.balance < 0 ? Math.abs(member.balance) : 0), 0);
   const settledCount = members.filter(member => member.balance === 0).length;
 
+  // Create themed styles
+  const themedStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: theme.colors.text,
+      letterSpacing: 0.5,
+    },
+    summaryButton: {
+      backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(111, 43, 212, 0.1)',
+      borderRadius: 20,
+      padding: 10,
+      borderWidth: darkMode ? 1 : 0,
+      borderColor: theme.colors.border,
+    },
+    summaryCard: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 20,
+      padding: 20,
+      marginBottom: 20,
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: darkMode ? 0.3 : 0.1,
+      shadowRadius: 8,
+      elevation: 5,
+      borderWidth: darkMode ? 1 : 0,
+      borderColor: theme.colors.border,
+    },
+    summaryRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    summaryItem: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    summaryDivider: {
+      width: 1,
+      backgroundColor: theme.colors.border,
+      marginHorizontal: 12,
+      opacity: 0.6,
+    },
+    summaryValue: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: theme.colors.text,
+      marginBottom: 6,
+      letterSpacing: 0.5,
+    },
+    summaryLabel: {
+      fontSize: 10,
+      color: theme.colors.secondaryText,
+      fontWeight: '500',
+      textTransform: 'uppercase',
+      letterSpacing: 0.8,
+    },
+    membersList: {
+      marginBottom: 20,
+    },
+    memberCard: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 16,
+      padding: 18,
+      marginBottom: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.2)" : "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: darkMode ? 0.2 : 0.08,
+      shadowRadius: 6,
+      elevation: 3,
+      borderWidth: darkMode ? 1 : 0,
+      borderColor: theme.colors.border,
+    },
+    memberInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    memberAvatar: {
+      width: 52,
+      height: 52,
+      borderRadius: 16,
+      backgroundColor: theme.colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    memberInitial: {
+      color: '#fff',
+      fontSize: 15,
+      fontWeight: '700',
+      letterSpacing: 0.5,
+    },
+    memberDetails: {
+      flex: 1,
+    },
+    memberNameRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    memberName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginRight: 8,
+      flex: 1,
+      letterSpacing: 0.2,
+    },
+    adminBadge: {
+      backgroundColor: theme.colors.warning,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 12,
+      shadowColor: theme.colors.warning,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.3,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    adminBadgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: '#fff',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    memberEmail: {
+      fontSize: 13,
+      color: theme.colors.secondaryText,
+      marginBottom: 4,
+      opacity: 0.8,
+    },
+    balanceStatus: {
+      fontSize: 11,
+      color: theme.colors.secondaryText,
+      textTransform: 'uppercase',
+      fontWeight: '600',
+      letterSpacing: 0.5,
+      opacity: 0.7,
+    },
+    balanceInfo: {
+      alignItems: 'flex-end',
+    },
+    balanceAmount: {
+      fontSize: 15,
+      fontWeight: '700',
+      marginBottom: 6,
+      letterSpacing: 0.3,
+    },
+    balanceIndicator: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    settlementCard: {
+      backgroundColor: theme.colors.card,
+      borderRadius: 20,
+      padding: 24,
+      alignItems: 'center',
+      shadowColor: darkMode ? "rgba(139, 92, 246, 0.3)" : "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: darkMode ? 0.3 : 0.1,
+      shadowRadius: 8,
+      elevation: 5,
+      borderWidth: darkMode ? 1 : 0,
+      borderColor: theme.colors.border,
+    },
+    settlementTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: theme.colors.text,
+      marginBottom: 6,
+      letterSpacing: 0.3,
+    },
+    settlementText: {
+      fontSize: 14,
+      color: theme.colors.secondaryText,
+      marginBottom: 20,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    settlementButton: {
+      backgroundColor: theme.colors.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 14,
+      borderRadius: 25,
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    settlementButtonText: {
+      color: '#fff',
+      fontWeight: '700',
+      marginLeft: 8,
+      fontSize: 15,
+      letterSpacing: 0.3,
+    },
+  });
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Members ({members.length})</Text>
-        <TouchableOpacity style={styles.summaryButton}>
-          <MaterialIcons name="info-outline" size={20} color="#6F2BD4FF" />
+    <View style={themedStyles.container}>
+      <View style={themedStyles.header}>
+        <Text style={themedStyles.title}>Members ({members.length})</Text>
+        <TouchableOpacity style={themedStyles.summaryButton}>
+          <MaterialIcons name="info-outline" size={20} color={theme.colors.primary} />
         </TouchableOpacity>
       </View>
 
       {/* Summary Stats */}
-      <View style={styles.summaryCard}>
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>${totalOwed.toFixed(2)}</Text>
-            <Text style={styles.summaryLabel}>Total Owed</Text>
+      <View style={themedStyles.summaryCard}>
+        <View style={themedStyles.summaryRow}>
+          <View style={themedStyles.summaryItem}>
+            <Text style={[themedStyles.summaryValue, { color: theme.colors.success }]}>
+              ${totalOwed.toFixed(2)}
+            </Text>
+            <Text style={themedStyles.summaryLabel}>Total Owed</Text>
           </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>${totalOwing.toFixed(2)}</Text>
-            <Text style={styles.summaryLabel}>Total Owing</Text>
+          <View style={themedStyles.summaryDivider} />
+          <View style={themedStyles.summaryItem}>
+            <Text style={[themedStyles.summaryValue, { color: theme.colors.danger }]}>
+              ${totalOwing.toFixed(2)}
+            </Text>
+            <Text style={themedStyles.summaryLabel}>Total Owing</Text>
           </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{settledCount}</Text>
-            <Text style={styles.summaryLabel}>Settled</Text>
+          <View style={themedStyles.summaryDivider} />
+          <View style={themedStyles.summaryItem}>
+            <Text style={[themedStyles.summaryValue, { color: theme.colors.secondaryText }]}>
+              {settledCount}
+            </Text>
+            <Text style={themedStyles.summaryLabel}>Settled</Text>
           </View>
         </View>
       </View>
 
       {/* Members List */}
-      <View style={styles.membersList}>
+      <View style={themedStyles.membersList}>
         {sortedMembers.map((member) => (
-          <TouchableOpacity key={member.id} style={styles.memberCard}>
-            <View style={styles.memberInfo}>
-              <View style={styles.memberAvatar}>
-                <Text style={styles.memberInitial}>
+          <TouchableOpacity key={member.id} style={themedStyles.memberCard} activeOpacity={0.7}>
+            <View style={themedStyles.memberInfo}>
+              <View style={themedStyles.memberAvatar}>
+                <Text style={themedStyles.memberInitial}>
                   {getInitials(member.name)}
                 </Text>
               </View>
-              <View style={styles.memberDetails}>
-                <View style={styles.memberNameRow}>
-                  <Text style={styles.memberName} numberOfLines={1}>
+              <View style={themedStyles.memberDetails}>
+                <View style={themedStyles.memberNameRow}>
+                  <Text style={themedStyles.memberName} numberOfLines={1}>
                     {member.name}
                   </Text>
                   {member.isAdmin && (
-                    <View style={styles.adminBadge}>
-                      <Text style={styles.adminBadgeText}>Admin</Text>
+                    <View style={themedStyles.adminBadge}>
+                      <Text style={themedStyles.adminBadgeText}>Admin</Text>
                     </View>
                   )}
                 </View>
                 {member.email && (
-                  <Text style={styles.memberEmail} numberOfLines={1}>
+                  <Text style={themedStyles.memberEmail} numberOfLines={1}>
                     {member.email}
                   </Text>
                 )}
-                <Text style={styles.balanceStatus}>
+                <Text style={themedStyles.balanceStatus}>
                   {getBalanceText(member.balance)}
                 </Text>
               </View>
             </View>
 
-            <View style={styles.balanceInfo}>
+            <View style={themedStyles.balanceInfo}>
               <Text
                 style={[
-                  styles.balanceAmount,
+                  themedStyles.balanceAmount,
                   { color: getBalanceColor(member.balance) }
                 ]}
               >
@@ -124,7 +358,7 @@ export const MembersList: React.FC<MembersListProps> = ({ members }) => {
               {/* Balance indicator */}
               <View
                 style={[
-                  styles.balanceIndicator,
+                  themedStyles.balanceIndicator,
                   { backgroundColor: getBalanceColor(member.balance) }
                 ]}
               />
@@ -135,195 +369,17 @@ export const MembersList: React.FC<MembersListProps> = ({ members }) => {
 
       {/* Quick Settlement Options */}
       {totalOwing > 0 && (
-        <View style={styles.settlementCard}>
-          <Text style={styles.settlementTitle}>Quick Settlement</Text>
-          <Text style={styles.settlementText}>
+        <View style={themedStyles.settlementCard}>
+          <Text style={themedStyles.settlementTitle}>Quick Settlement</Text>
+          <Text style={themedStyles.settlementText}>
             Simplify payments between members
           </Text>
-          <TouchableOpacity style={styles.settlementButton}>
+          <TouchableOpacity style={themedStyles.settlementButton} activeOpacity={0.8}>
             <MaterialIcons name="account-balance-wallet" size={20} color="#fff" />
-            <Text style={styles.settlementButtonText}>Settle All Debts</Text>
+            <Text style={themedStyles.settlementButtonText}>Settle All Debts</Text>
           </TouchableOpacity>
         </View>
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  summaryButton: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 20,
-    padding: 8,
-  },
-  summaryCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  summaryItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  summaryDivider: {
-    width: 1,
-    backgroundColor: '#dee2e6',
-    marginHorizontal: 12,
-  },
-  summaryValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    color: '#666',
-  },
-  membersList: {
-    marginBottom: 20,
-  },
-  memberCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  memberInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  memberAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#6F2BD4FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  memberInitial: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  memberDetails: {
-    flex: 1,
-  },
-  memberNameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  memberName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginRight: 8,
-    flex: 1,
-  },
-  adminBadge: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  adminBadgeText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  memberEmail: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 2,
-  },
-  balanceStatus: {
-    fontSize: 11,
-    color: '#999',
-    textTransform: 'uppercase',
-    fontWeight: '500',
-  },
-  balanceInfo: {
-    alignItems: 'flex-end',
-  },
-  balanceAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  balanceIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  settlementCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  settlementTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  settlementText: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  settlementButton: {
-    backgroundColor: '#6F2BD4FF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
-  },
-  settlementButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-});

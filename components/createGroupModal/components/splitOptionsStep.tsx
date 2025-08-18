@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Contact, Bill } from '../utils/constants';
+import { useTheme } from '../../../theme/themeContext';
 
 interface SplitOptionsStepProps {
   splitType: 'equal' | 'percentage';
@@ -20,6 +21,8 @@ export default function SplitOptionsStep({
   setCustomPercentages,
   bills
 }: SplitOptionsStepProps) {
+  const { theme } = useTheme();
+
   const updatePercentage = (contactId: string, percentage: string) => {
     const numPercentage = parseFloat(percentage) || 0;
     setCustomPercentages(prev => ({
@@ -30,8 +33,10 @@ export default function SplitOptionsStep({
 
   const getTotalBillAmount = () => bills.reduce((sum, bill) => sum + bill.amount, 0);
 
+  const styles = createStyles(theme);
+
   return (
-    <View style={styles.stepContent}>
+    <View style={[styles.stepContent, { backgroundColor: theme.colors.background }]}>
       <Text style={styles.stepTitle}>⚖️ Split Options</Text>
       <Text style={styles.stepDescription}>Choose how to divide the expenses</Text>
       
@@ -46,7 +51,7 @@ export default function SplitOptionsStep({
           <MaterialIcons 
             name="equalizer" 
             size={24} 
-            color={splitType === 'equal' ? 'white' : '#007AFF'} 
+            color={splitType === 'equal' ? 'white' : theme.colors.primary} 
           />
           <Text style={[
             styles.splitTypeTitle,
@@ -72,7 +77,7 @@ export default function SplitOptionsStep({
           <MaterialIcons 
             name="pie-chart" 
             size={24} 
-            color={splitType === 'percentage' ? 'white' : '#007AFF'} 
+            color={splitType === 'percentage' ? 'white' : theme.colors.primary} 
           />
           <Text style={[
             styles.splitTypeTitle,
@@ -103,7 +108,7 @@ export default function SplitOptionsStep({
                   onChangeText={(text) => updatePercentage(contact.id, text)}
                   keyboardType="numeric"
                   maxLength={3}
-                  placeholderTextColor="#999"
+                  placeholderTextColor={theme.colors.secondaryText}
                 />
                 <Text style={styles.percentageSymbol}>%</Text>
               </View>
@@ -149,70 +154,90 @@ export default function SplitOptionsStep({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   stepContent: {
     padding: 20,
   },
   stepTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#212529',
+    color: theme.colors.text,
     marginBottom: 8,
   },
   stepDescription: {
     fontSize: 16,
-    color: '#6c757d',
+    color: theme.colors.secondaryText,
     marginBottom: 24,
     lineHeight: 22,
   },
   splitTypeContainer: {
     flexDirection: 'row',
     marginBottom: 24,
+    gap: 12,
   },
   splitTypeCard: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
-    marginRight: 12,
     borderWidth: 2,
-    borderColor: '#dee2e6',
+    borderColor: theme.colors.border,
+    shadowColor: theme.dark ? 'rgba(139, 92, 246, 0.2)' : '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: theme.dark ? 0.3 : 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   selectedSplitCard: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+    shadowColor: theme.colors.primary,
+    shadowOpacity: 0.3,
   },
   splitTypeTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#212529',
+    color: theme.colors.text,
     marginTop: 8,
     marginBottom: 4,
+    textAlign: 'center',
   },
   selectedSplitTitle: {
     color: 'white',
   },
   splitTypeDescription: {
     fontSize: 12,
-    color: '#6c757d',
+    color: theme.colors.secondaryText,
     textAlign: 'center',
+    lineHeight: 16,
   },
   selectedSplitDescription: {
     color: 'rgba(255, 255, 255, 0.8)',
   },
   percentageContainer: {
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: theme.colors.border,
+    shadowColor: theme.dark ? 'rgba(139, 92, 246, 0.2)' : '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: theme.dark ? 0.3 : 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   percentageTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#212529',
+    color: theme.colors.text,
     marginBottom: 16,
   },
   percentageRow: {
@@ -223,7 +248,7 @@ const styles = StyleSheet.create({
   },
   percentageName: {
     fontSize: 16,
-    color: '#495057',
+    color: theme.colors.text,
     flex: 1,
   },
   percentageInputContainer: {
@@ -232,42 +257,51 @@ const styles = StyleSheet.create({
   },
   percentageInput: {
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: theme.colors.border,
     borderRadius: 8,
     padding: 8,
     width: 60,
     textAlign: 'center',
     fontSize: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.dark ? 'rgba(139, 92, 246, 0.1)' : '#f8f9fa',
+    color: theme.colors.text,
   },
   percentageSymbol: {
     fontSize: 16,
-    color: '#6c757d',
+    color: theme.colors.secondaryText,
     marginLeft: 8,
   },
   remainingPercentage: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#dee2e6',
+    borderTopColor: theme.colors.border,
   },
   remainingText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#007AFF',
+    color: theme.colors.primary,
     textAlign: 'center',
   },
   previewCard: {
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#dee2e6',
+    borderColor: theme.colors.border,
+    shadowColor: theme.dark ? 'rgba(139, 92, 246, 0.2)' : '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: theme.dark ? 0.3 : 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   previewTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#212529',
+    color: theme.colors.text,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -277,12 +311,13 @@ const styles = StyleSheet.create({
   previewTotal: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#007AFF',
+    color: theme.colors.primary,
     marginBottom: 8,
   },
   previewAmount: {
     fontSize: 16,
-    color: '#495057',
+    color: theme.colors.text,
     marginBottom: 4,
+    textAlign: 'center',
   },
 });
